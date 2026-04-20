@@ -32,7 +32,11 @@ function Login({ onLoginSuccess }) {
         onLoginSuccess(response.data.data);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      const errorMsg = err.response?.data?.message || 
+                       err.message || 
+                       'Login failed. Please check your connection and try again.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -148,7 +152,11 @@ function Register({ onRegisterSuccess, onSwitchToLogin }) {
         }, 1500);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', err);
+      const errorMsg = err.response?.data?.message || 
+                       err.message || 
+                       'Registration failed. Please check your connection and try again.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

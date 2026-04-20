@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function Dashboard({ onViewUpload, onViewClaim }) {
+function Dashboard({ onViewUpload, onViewClaim, user }) {
   const [lostItems, setLostItems] = useState([]);
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [myEmail, setMyEmail] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [claimFormData, setClaimFormData] = useState({
-    name: '',
-    email: '',
     description: '',
     contactDetails: ''
   });
@@ -37,8 +35,6 @@ function Dashboard({ onViewUpload, onViewClaim }) {
   const handleClaimClick = (item) => {
     setSelectedItem(item);
     setClaimFormData({
-      name: '',
-      email: '',
       description: '',
       contactDetails: ''
     });
@@ -48,6 +44,7 @@ function Dashboard({ onViewUpload, onViewClaim }) {
     e.preventDefault();
     try {
       await axios.post('/api/items/claim', {
+        userId: user.id,
         name: claimFormData.name,
         email: claimFormData.email,
         lostItemId: selectedItem.id,
@@ -73,11 +70,11 @@ function Dashboard({ onViewUpload, onViewClaim }) {
 
   // Filter data
   const activeItems = lostItems.filter(item => item.status === 'active');
-  const myPostedItems = lostItems.filter(item => item.email === myEmail);
-  const myClaimedItems = claims.filter(claim => claim.email === myEmail);
+  const myPostedItems = lostItems.filter(item => item.userId === user.id);
+  const myClaimedItems = claims.filter(claim => claim.userId === user.id);
   const claimsOnMyItems = claims.filter(claim => {
     const item = lostItems.find(i => i.id === claim.lostItemId);
-    return item && item.email === myEmail;
+    return item && item.userId === user.id;
   });
 
   if (loading) {
@@ -108,33 +105,9 @@ function Dashboard({ onViewUpload, onViewClaim }) {
             </div>
 
             <form onSubmit={handleClaimSubmit} className="claim-modal-form">
-              <h4>Claim This Item</h4>
-              
-              <div className="form-group">
-                <label htmlFor="modal-name">Your Name *</label>
-                <input
-                  type="text"
-                  id="modal-name"
-                  name="name"
-                  value={claimFormData.name}
-                  onChange={handleClaimFormChange}
-                  placeholder="Enter your name"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="modal-email">Your Email *</label>
-                <input
-                  type="email"
-                  id="modal-email"
-                  name="email"
-                  value={claimFormData.email}
-                  onChange={handleClaimFormChange}
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
+              <h4>Your Information (Auto-filled)</h4>
+              <p><strong>Name:</strong> {user.name}</p>
+              <p><strong>Email:</strong> {user.email}</p>
 
               <div className="form-group">
                 <label htmlFor="modal-description">How Did You Find It? *</label>

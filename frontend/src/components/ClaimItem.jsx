@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function ClaimItem({ refreshTrigger }) {
+function ClaimItem({ refreshTrigger, user }) {
   const [lostItems, setLostItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -10,8 +10,6 @@ function ClaimItem({ refreshTrigger }) {
   const [messageType, setMessageType] = useState('');
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
     description: '',
     contactDetails: ''
   });
@@ -37,8 +35,6 @@ function ClaimItem({ refreshTrigger }) {
   const handleSelectItem = (item) => {
     setSelectedItem(item);
     setFormData({
-      name: '',
-      email: '',
       description: '',
       contactDetails: ''
     });
@@ -60,8 +56,9 @@ function ClaimItem({ refreshTrigger }) {
 
     try {
       const claimData = {
-        name: formData.name,
-        email: formData.email,
+        userId: user.id,
+        name: user.name,
+        email: user.email,
         lostItemId: selectedItem.id,
         description: formData.description,
         contactDetails: formData.contactDetails
@@ -75,8 +72,6 @@ function ClaimItem({ refreshTrigger }) {
       setTimeout(() => {
         setSelectedItem(null);
         setFormData({
-          name: '',
-          email: '',
           description: '',
           contactDetails: ''
         });
@@ -161,33 +156,9 @@ function ClaimItem({ refreshTrigger }) {
             )}
 
             <form onSubmit={handleSubmitClaim} className="claim-form">
-              <h4>Your Information</h4>
-
-              <div className="form-group">
-                <label htmlFor="claim-name">Your Name *</label>
-                <input
-                  type="text"
-                  id="claim-name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Enter your full name"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="claim-email">Your Email *</label>
-                <input
-                  type="email"
-                  id="claim-email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Enter your email address"
-                  required
-                />
-              </div>
+              <h4>Your Information (Auto-filled)</h4>
+              <p><strong>Name:</strong> {user.name}</p>
+              <p><strong>Email:</strong> {user.email}</p>
 
               <div className="form-group">
                 <label htmlFor="claim-description">How Did You Find It? *</label>

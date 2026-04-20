@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-function UploadItem({ onItemUploaded }) {
+function UploadItem({ onItemUploaded, user }) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
     itemName: '',
     description: '',
     category: 'electronics',
@@ -45,15 +43,23 @@ function UploadItem({ onItemUploaded }) {
     setMessage('');
 
     try {
-      await axios.post('/api/items/lost', formData);
+      const response = await axios.post('/api/items/lost', {
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        itemName: formData.itemName,
+        description: formData.description,
+        category: formData.category,
+        location: formData.location,
+        dateOfLoss: formData.dateOfLoss,
+        image: formData.image
+      });
       
       setMessageType('success');
       setMessage('✓ Lost item reported successfully! We will help you find it.');
       
       // Reset form
       setFormData({
-        name: '',
-        email: '',
         itemName: '',
         description: '',
         category: 'electronics',
@@ -87,31 +93,11 @@ function UploadItem({ onItemUploaded }) {
         )}
 
         <form onSubmit={handleSubmit} className="upload-form">
-          {/* Personal Information */}
-          <div className="form-group">
-            <label htmlFor="name">Your Name *</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter your full name"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Your Email *</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Enter your email address"
-              required
-            />
+          {/* Auto-filled User Information */}
+          <div className="user-info-display">
+            <h4>Your Information (Auto-filled)</h4>
+            <p><strong>Name:</strong> {user.name}</p>
+            <p><strong>Email:</strong> {user.email}</p>
           </div>
 
           {/* Item Information */}

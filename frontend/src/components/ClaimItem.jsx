@@ -67,7 +67,7 @@ function ClaimItem({ refreshTrigger }) {
         contactDetails: formData.contactDetails
       };
 
-      const response = await axios.post('/api/items/claim', claimData);
+      await axios.post('/api/items/claim', claimData);
 
       setMessageType('success');
       setMessage('✓ Claim submitted successfully! The item owner will contact you soon.');

@@ -1,46 +1,51 @@
 import React, { useState } from 'react';
+import Dashboard from './Dashboard';
 import UploadItem from './UploadItem';
 import ClaimItem from './ClaimItem';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('upload');
+  const [currentView, setCurrentView] = useState('dashboard');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
 
   const handleItemUploaded = () => {
     setRefreshTrigger(prev => prev + 1);
+    setCurrentView('dashboard');
+  };
+
+  const handleViewUpload = () => {
+    setCurrentView('upload');
+  };
+
+  const handleViewClaim = () => {
+    setCurrentView('claim');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentView('dashboard');
   };
 
   return (
     <div className="app-container">
       <header className="app-header">
-        <h1>Lost & Found</h1>
-        <p className="subtitle">Find or Report Your Lost Items</p>
+        <div className="header-content">
+          <h1>Lost & Found</h1>
+          <p className="subtitle">Find or Report Your Lost Items</p>
+        </div>
+        {currentView !== 'dashboard' && (
+          <button className="back-to-home-btn" onClick={handleBackToDashboard}>
+            ← Back to Dashboard
+          </button>
+        )}
       </header>
 
-      <div className="tabs-container">
-        <button
-          className={`tab-button ${activeTab === 'upload' ? 'active' : ''}`}
-          onClick={() => handleTabChange('upload')}
-        >
-          📤 Report Lost Item
-        </button>
-        <button
-          className={`tab-button ${activeTab === 'claim' ? 'active' : ''}`}
-          onClick={() => handleTabChange('claim')}
-        >
-          ✋ Claim Lost Item
-        </button>
-      </div>
-
-      <div className="tabs-content">
-        {activeTab === 'upload' && (
+      <div className="main-content">
+        {currentView === 'dashboard' && (
+          <Dashboard onViewUpload={handleViewUpload} onViewClaim={handleViewClaim} />
+        )}
+        {currentView === 'upload' && (
           <UploadItem onItemUploaded={handleItemUploaded} />
         )}
-        {activeTab === 'claim' && (
+        {currentView === 'claim' && (
           <ClaimItem refreshTrigger={refreshTrigger} />
         )}
       </div>

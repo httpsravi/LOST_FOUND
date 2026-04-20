@@ -45,7 +45,7 @@ function UploadItem({ onItemUploaded }) {
     setMessage('');
 
     try {
-      const response = await axios.post('/api/items/lost', formData);
+      await axios.post('/api/items/lost', formData);
       
       setMessageType('success');
       setMessage('✓ Lost item reported successfully! We will help you find it.');

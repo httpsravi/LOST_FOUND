@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Dashboard from './Dashboard';
 import UploadItem from './UploadItem';
 import ClaimItem from './ClaimItem';
@@ -11,13 +12,18 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
+    // ✅ On app load: restore user session AND set JWT token in axios headers
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const storedToken = localStorage.getItem('token');
+
+    if (storedUser && storedToken) {
       try {
         setUser(JSON.parse(storedUser));
+        // Restore JWT token for all future axios requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
       } catch (error) {
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
       }
     }
     setLoading(false);
@@ -30,64 +36,33 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setCurrentView('dashboard');
   };
 
   const handleItemUploaded = () => {
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
     setCurrentView('dashboard');
   };
 
-  const handleViewUpload = () => {
-    setCurrentView('upload');
-  };
-
-  const handleViewClaim = () => {
-    setCurrentView('claim');
-  };
-
-  const handleBackToDashboard = () => {
-    setCurrentView('dashboard');
-  };
-
-  if (loading) {
-    return <div className="loading-container">Loading...</div>;
-  }
-
-  // If no user is logged in, show login screen
-  if (!user) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
-  }
+  if (loading) return <div className="loading-container">Loading...</div>;
+  if (!user) return <Login onLoginSuccess={handleLoginSuccess} />;
 
   return (
     <div className="app-container">
       <header className="app-header">
-        <div className="nav-left">
-          <div className="brand-mark">Lost & Found</div>
-          <div className="header-nav">
-            <button
-              className={`nav-link ${currentView === 'dashboard' ? 'active' : ''}`}
-              onClick={handleBackToDashboard}
-            >
-              Dashboard
-            </button>
-            <button
-              className={`nav-link ${currentView === 'upload' ? 'active' : ''}`}
-              onClick={handleViewUpload}
-            >
-              Report Item
-            </button>
-            <button
-              className={`nav-link ${currentView === 'claim' ? 'active' : ''}`}
-              onClick={handleViewClaim}
-            >
-              Browse Items
-            </button>
-          </div>
+        <div className="header-content">
+          <h1>Lost & Found</h1>
+          <p className="subtitle">Find or Report Your Lost Items</p>
         </div>
-
         <div className="header-actions">
+          {currentView !== 'dashboard' && (
+            <button className="back-to-home-btn" onClick={() => setCurrentView('dashboard')}>
+              ← Back to Dashboard
+            </button>
+          )}
           <div className="user-info">
             <span className="user-name">{user.name}</span>
             <button className="logout-btn" onClick={handleLogout}>Logout</button>
@@ -97,7 +72,7 @@ function App() {
 
       <div className="main-content">
         {currentView === 'dashboard' && (
-          <Dashboard onViewUpload={handleViewUpload} onViewClaim={handleViewClaim} user={user} />
+          <Dashboard onViewUpload={() => setCurrentView('upload')} onViewClaim={() => setCurrentView('claim')} user={user} />
         )}
         {currentView === 'upload' && (
           <UploadItem onItemUploaded={handleItemUploaded} user={user} />

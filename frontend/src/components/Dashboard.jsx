@@ -158,18 +158,22 @@ function Dashboard({ onViewUpload, onViewClaim, user }) {
                     </div>
                   )}
                   <div className="item-info">
-                    <h4>{item.itemName}</h4>
-                    <p className="category-badge">{item.category}</p>
-                    <p className="location">📍 {item.location}</p>
-                    <p className="description-short">{item.description.substring(0, 60)}...</p>
-                    <p className="owner">Posted by: {item.name}</p>
+                    <div className="item-main-content">
+                      <h4>{item.itemName}</h4>
+                      <p className="category-badge">{item.category}</p>
+                      <p className="location">📍 {item.location}</p>
+                      <p className="description-short">{item.description}</p>
+                    </div>
+                    <div className="item-meta">
+                      <p className="owner">Posted by: {item.name}</p>
+                      <button 
+                        className="claim-btn"
+                        onClick={() => handleClaimClick(item)}
+                      >
+                        Claim Item
+                      </button>
+                    </div>
                   </div>
-                  <button 
-                    className="claim-btn"
-                    onClick={() => handleClaimClick(item)}
-                  >
-                    Claim Item →
-                  </button>
                 </div>
               ))}
             </div>
@@ -200,10 +204,16 @@ function Dashboard({ onViewUpload, onViewClaim, user }) {
                     </div>
                   )}
                   <div className="item-info">
-                    <h4>{item.itemName}</h4>
-                    <p className="category-badge">{item.category}</p>
-                    <p className="date">📅 {new Date(item.dateOfLoss).toLocaleDateString()}</p>
-                    <p className="location">📍 {item.location}</p>
+                    <div className="item-main-content">
+                      <h4>{item.itemName}</h4>
+                      <p className="category-badge">{item.category}</p>
+                      <p className="location">📍 {item.location}</p>
+                      <p className="description-short">{item.description}</p>
+                    </div>
+                    <div className="item-meta">
+                      <p className="date">📅 {new Date(item.dateOfLoss).toLocaleDateString()}</p>
+                      <p className="owner">Posted by: {item.name}</p>
+                    </div>
                   </div>
                 </div>
               ))}

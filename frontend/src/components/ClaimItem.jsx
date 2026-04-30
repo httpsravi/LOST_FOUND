@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+  import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function ClaimItem({ refreshTrigger, user }) {
@@ -113,18 +113,22 @@ function ClaimItem({ refreshTrigger, user }) {
                         </div>
                       )}
                       <div className="item-content">
-                        <h4>{item.itemName}</h4>
-                        <p className="item-category">Category: <strong>{item.category}</strong></p>
-                        <p className="item-location">Location: <strong>{item.location}</strong></p>
-                        <p className="item-date">Lost on: <strong>{new Date(item.dateOfLoss).toLocaleDateString()}</strong></p>
-                        <p className="item-description">{item.description}</p>
-                        <p className="item-owner">Posted by: {item.name}</p>
-                        <button
-                          className="claim-button"
-                          onClick={() => handleSelectItem(item)}
-                        >
-                          I Found This Item
-                        </button>
+                        <div className="item-main-content">
+                          <h4>{item.itemName}</h4>
+                          <p className="category-badge">{item.category}</p>
+                          <p className="item-location">📍 {item.location}</p>
+                          <p className="item-date">📅 {new Date(item.dateOfLoss).toLocaleDateString()}</p>
+                          <p className="item-description">{item.description}</p>
+                        </div>
+                        <div className="item-meta">
+                          <p className="item-owner">Posted by: {item.name}</p>
+                          <button
+                            className="claim-button"
+                            onClick={() => handleSelectItem(item)}
+                          >
+                            Claim Item
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

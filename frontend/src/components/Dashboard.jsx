@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function Dashboard({ onViewUpload, onViewClaim, user }) {
+function Dashboard({ onViewUpload, onViewClaim, onOpenChat, user }) {
   const [lostItems, setLostItems] = useState([]);
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,6 +10,7 @@ function Dashboard({ onViewUpload, onViewClaim, user }) {
     description: '',
     contactDetails: ''
   });
+  const [activeTab, setActiveTab] = useState('all-items');
 
   useEffect(() => {
     fetchAllData();
@@ -75,10 +76,187 @@ function Dashboard({ onViewUpload, onViewClaim, user }) {
     const item = lostItems.find(i => i.id === claim.lostItemId);
     return item && item.userId === user.id;
   });
+  const pendingClaimsOnMyItems = claimsOnMyItems.filter((claim) => claim.status === 'pending');
 
   if (loading) {
     return <div className="loading-container">Loading dashboard...</div>;
   }
+
+  const renderAllItemsSection = () => (
+    <div className="dashboard-section lost-items-section">
+      <div className="section-header">
+        <h3>📋 All Lost Items</h3>
+        <span className="item-count">{activeItems.length}</span>
+      </div>
+      {activeItems.length === 0 ? (
+        <div className="empty-section">
+          <span className="empty-icon">🔍</span>
+          <p>No items yet</p>
+          <button onClick={onViewClaim} className="action-btn">Browse Items</button>
+        </div>
+      ) : (
+        <div className="items-container">
+          {activeItems.map(item => (
+            <div key={item.id} className="item-card compact">
+              {item.image && (
+                <div className="item-image-small">
+                  <img src={item.image} alt={item.itemName} />
+                </div>
+              )}
+              <div className="item-info">
+                <div className="item-main-content">
+                  <h4>{item.itemName}</h4>
+                  <p className="category-badge">{item.category}</p>
+                  <p className="location">📍 {item.location}</p>
+                  <p className="description-short">{item.description}</p>
+                </div>
+                <div className="item-meta">
+                  <p className="owner">Posted by: {item.name}</p>
+                  <button
+                    className="claim-btn"
+                    onClick={() => handleClaimClick(item)}
+                  >
+                    Claim Item
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderMyPostsSection = () => (
+    <div className="dashboard-section my-items-section">
+      <div className="section-header">
+        <h3>📤 My Posted Items</h3>
+        <span className="item-count">{myPostedItems.length}</span>
+      </div>
+      {myPostedItems.length === 0 ? (
+        <div className="empty-section">
+          <span className="empty-icon">📭</span>
+          <p>You haven't posted any items</p>
+          <button onClick={onViewUpload} className="action-btn">Post Lost Item</button>
+        </div>
+      ) : (
+        <div className="items-container">
+          {myPostedItems.map(item => (
+            <div key={item.id} className="item-card my-card">
+              <div className="item-status">
+                <span className={`status-badge ${item.status}`}>{item.status}</span>
+              </div>
+              {item.image && (
+                <div className="item-image-small">
+                  <img src={item.image} alt={item.itemName} />
+                </div>
+              )}
+              <div className="item-info">
+                <div className="item-main-content">
+                  <h4>{item.itemName}</h4>
+                  <p className="category-badge">{item.category}</p>
+                  <p className="location">📍 {item.location}</p>
+                  <p className="description-short">{item.description}</p>
+                </div>
+                <div className="item-meta">
+                  <p className="date">📅 {new Date(item.dateOfLoss).toLocaleDateString()}</p>
+                  <p className="owner">Posted by: {item.name}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderClaimsSection = () => (
+    <div className="dashboard-section pending-section">
+      <div className="section-header">
+        <h3>⏳ Pending Claims on My Items</h3>
+        <div className="section-header-right">
+          <span className="pending-notification-badge">{pendingClaimsOnMyItems.length}</span>
+          <span className="item-count">{claimsOnMyItems.length}</span>
+        </div>
+      </div>
+      {claimsOnMyItems.length === 0 ? (
+        <div className="empty-section">
+          <span className="empty-icon">💬</span>
+          <p>No claims yet</p>
+          <button onClick={onViewUpload} className="action-btn">Post Lost Item</button>
+        </div>
+      ) : (
+        <div className="claims-container">
+          {claimsOnMyItems.map(claim => {
+            const item = lostItems.find(i => i.id === claim.lostItemId);
+            return (
+              <div key={claim.id} className="claim-card pending" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div className="claim-card-top" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                  <div className="claim-header">
+                    <h5>{item?.itemName}</h5>
+                    <span className="status-badge pending">Pending</span>
+                  </div>
+                  <div className="claim-details" style={{ flex: 'none', marginBottom: '12px' }}>
+                    <p><strong>Claimer:</strong> {claim.name}</p>
+                    <p><strong>Email:</strong> {claim.email}</p>
+                    <p><strong>Found:</strong> {claim.description}</p>
+                    {claim.contactDetails && (
+                      <p><strong>Contact:</strong> {claim.contactDetails}</p>
+                    )}
+                    <p className="claim-date">📅 {new Date(claim.claimDate).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <button className="claim-btn" onClick={() => onOpenChat(claim.id || claim._id)}>
+                  Open Chat →
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderMyClaimsSection = () => (
+    <div className="dashboard-section my-claims-section">
+      <div className="section-header">
+        <h3>🙋 My Claims</h3>
+        <span className="item-count">{myClaimedItems.length}</span>
+      </div>
+      {myClaimedItems.length === 0 ? (
+        <div className="empty-section">
+          <span className="empty-icon">🙋</span>
+          <p>You haven't claimed any items</p>
+          <button onClick={onViewClaim} className="action-btn">Browse Items</button>
+        </div>
+      ) : (
+        <div className="claims-container">
+          {myClaimedItems.map(claim => {
+            const item = lostItems.find(i => i.id === claim.lostItemId);
+            return (
+              <div key={claim.id} className="claim-card my-claim" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div className="claim-card-top" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                  <div className="claim-header">
+                    <h5>{item?.itemName}</h5>
+                    <span className={`status-badge ${claim.status}`}>{claim.status}</span>
+                  </div>
+                  <div className="claim-details" style={{ flex: 'none', marginBottom: '12px' }}>
+                    <p><strong>Item Owner:</strong> {item?.name}</p>
+                    <p><strong>Owner Email:</strong> {item?.email}</p>
+                    <p><strong>Your Description:</strong> {claim.description}</p>
+                    <p className="claim-date">📅 {new Date(claim.claimDate).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <button className="claim-btn" onClick={() => onOpenChat(claim.id || claim._id)}>
+                  Open Chat →
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="dashboard-container">
@@ -139,155 +317,27 @@ function Dashboard({ onViewUpload, onViewClaim, user }) {
         </div>
       ) : null}
 
-      <div className="dashboard-grid">
-        {/* Section 1: All Lost Items */}
-        <div className="dashboard-section lost-items-section">
-          <div className="section-header">
-            <h3>📋 All Lost Items</h3>
-            <span className="item-count">{activeItems.length}</span>
-          </div>
-          {activeItems.length === 0 ? (
-            <div className="empty-section">No active lost items</div>
-          ) : (
-            <div className="items-container">
-              {activeItems.map(item => (
-                <div key={item.id} className="item-card compact">
-                  {item.image && (
-                    <div className="item-image-small">
-                      <img src={item.image} alt={item.itemName} />
-                    </div>
-                  )}
-                  <div className="item-info">
-                    <div className="item-main-content">
-                      <h4>{item.itemName}</h4>
-                      <p className="category-badge">{item.category}</p>
-                      <p className="location">📍 {item.location}</p>
-                      <p className="description-short">{item.description}</p>
-                    </div>
-                    <div className="item-meta">
-                      <p className="owner">Posted by: {item.name}</p>
-                      <button 
-                        className="claim-btn"
-                        onClick={() => handleClaimClick(item)}
-                      >
-                        Claim Item
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="tab-bar">
+        <button className={`tab-btn ${activeTab === 'all-items' ? 'active' : ''}`} onClick={() => setActiveTab('all-items')}>
+          All Items
+        </button>
+        <button className={`tab-btn ${activeTab === 'my-posts' ? 'active' : ''}`} onClick={() => setActiveTab('my-posts')}>
+          My Posts
+        </button>
+        <button className={`tab-btn ${activeTab === 'claims' ? 'active' : ''}`} onClick={() => setActiveTab('claims')}>
+          Claims
+          {pendingClaimsOnMyItems.length > 0 && <span className="tab-badge">{pendingClaimsOnMyItems.length}</span>}
+        </button>
+        <button className={`tab-btn ${activeTab === 'my-claims' ? 'active' : ''}`} onClick={() => setActiveTab('my-claims')}>
+          My Claims
+        </button>
+      </div>
 
-        {/* Section 2: My Posted Items */}
-        <div className="dashboard-section my-items-section">
-          <div className="section-header">
-            <h3>📤 My Posted Items</h3>
-            <span className="item-count">{myPostedItems.length}</span>
-          </div>
-          {myPostedItems.length === 0 ? (
-            <div className="empty-section">
-              <p>You haven't posted any lost items yet</p>
-              <button onClick={onViewUpload} className="action-btn">Post Lost Item</button>
-            </div>
-          ) : (
-            <div className="items-container">
-              {myPostedItems.map(item => (
-                <div key={item.id} className="item-card my-card">
-                  <div className="item-status">
-                    <span className={`status-badge ${item.status}`}>{item.status}</span>
-                  </div>
-                  {item.image && (
-                    <div className="item-image-small">
-                      <img src={item.image} alt={item.itemName} />
-                    </div>
-                  )}
-                  <div className="item-info">
-                    <div className="item-main-content">
-                      <h4>{item.itemName}</h4>
-                      <p className="category-badge">{item.category}</p>
-                      <p className="location">📍 {item.location}</p>
-                      <p className="description-short">{item.description}</p>
-                    </div>
-                    <div className="item-meta">
-                      <p className="date">📅 {new Date(item.dateOfLoss).toLocaleDateString()}</p>
-                      <p className="owner">Posted by: {item.name}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Section 3: Pending Claims on My Items */}
-        <div className="dashboard-section pending-section">
-          <div className="section-header">
-            <h3>⏳ Pending Claims on My Items</h3>
-            <span className="item-count">{claimsOnMyItems.length}</span>
-          </div>
-          {claimsOnMyItems.length === 0 ? (
-            <div className="empty-section">No pending claims on your items</div>
-          ) : (
-            <div className="claims-container">
-              {claimsOnMyItems.map(claim => {
-                const item = lostItems.find(i => i.id === claim.lostItemId);
-                return (
-                  <div key={claim.id} className="claim-card pending">
-                    <div className="claim-header">
-                      <h5>{item?.itemName}</h5>
-                      <span className="status-badge pending">Pending</span>
-                    </div>
-                    <div className="claim-details">
-                      <p><strong>Claimer:</strong> {claim.name}</p>
-                      <p><strong>Email:</strong> {claim.email}</p>
-                      <p><strong>Found:</strong> {claim.description}</p>
-                      {claim.contactDetails && (
-                        <p><strong>Contact:</strong> {claim.contactDetails}</p>
-                      )}
-                      <p className="claim-date">📅 {new Date(claim.claimDate).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Section 4: My Claims */}
-        <div className="dashboard-section my-claims-section">
-          <div className="section-header">
-            <h3>🙋 My Claims</h3>
-            <span className="item-count">{myClaimedItems.length}</span>
-          </div>
-          {myClaimedItems.length === 0 ? (
-            <div className="empty-section">
-              <p>You haven't claimed any items yet</p>
-              <button onClick={onViewClaim} className="action-btn">Browse Lost Items</button>
-            </div>
-          ) : (
-            <div className="claims-container">
-              {myClaimedItems.map(claim => {
-                const item = lostItems.find(i => i.id === claim.lostItemId);
-                return (
-                  <div key={claim.id} className="claim-card my-claim">
-                    <div className="claim-header">
-                      <h5>{item?.itemName}</h5>
-                      <span className={`status-badge ${claim.status}`}>{claim.status}</span>
-                    </div>
-                    <div className="claim-details">
-                      <p><strong>Item Owner:</strong> {item?.name}</p>
-                      <p><strong>Owner Email:</strong> {item?.email}</p>
-                      <p><strong>Your Description:</strong> {claim.description}</p>
-                      <p className="claim-date">📅 {new Date(claim.claimDate).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+      <div className="tab-content">
+        {activeTab === 'all-items' && renderAllItemsSection()}
+        {activeTab === 'my-posts' && renderMyPostsSection()}
+        {activeTab === 'claims' && renderClaimsSection()}
+        {activeTab === 'my-claims' && renderMyClaimsSection()}
       </div>
 
       <div className="dashboard-actions">
@@ -298,6 +348,7 @@ function Dashboard({ onViewUpload, onViewClaim, user }) {
           Browse & Claim Items
         </button>
       </div>
+      <button className="mobile-fab" onClick={onViewUpload} aria-label="Report lost item">+</button>
     </div>
   );
 }

@@ -5,6 +5,7 @@ require('dotenv').config();
 const connectDB = require('./db');
 const authRoutes = require('./authRoutes');
 const itemRoutes = require('./itemRoutes');
+const chatRoutes = require('./chatRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ app.use(express.json({ limit: '10mb' })); // 10mb limit for base64 image uploads
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Helpful root route so opening backend URL doesn't show "Cannot GET /"
 app.get('/', (req, res) => {

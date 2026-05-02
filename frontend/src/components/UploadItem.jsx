@@ -93,6 +93,7 @@ function UploadItem({ onItemUploaded, user }) {
         )}
 
         <form onSubmit={handleSubmit} className="upload-form">
+          <div className="form-progress">Step 1 of 2</div>
           {/* Auto-filled User Information */}
           <div className="user-info-display">
             <h4>Your Information (Auto-filled)</h4>
@@ -141,7 +142,7 @@ function UploadItem({ onItemUploaded, user }) {
               value={formData.description}
               onChange={handleInputChange}
               placeholder="Describe the item in detail (color, size, distinctive marks, etc.)"
-              rows="4"
+              rows="3"
               required
             ></textarea>
           </div>
@@ -189,7 +190,7 @@ function UploadItem({ onItemUploaded, user }) {
 
           <button
             type="submit"
-            className="submit-button"
+            className="submit-button sticky-submit"
             disabled={loading}
           >
             {loading ? 'Uploading...' : 'Report Lost Item'}

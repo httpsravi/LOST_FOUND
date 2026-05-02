@@ -200,6 +200,26 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.section-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pending-notification-badge {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #101010;
+  background: var(--warning);
+}
+
 .section-header h3 {
   color: #f5f5f5;
   font-size: 1rem;
@@ -438,6 +458,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: border-color 0.2s ease;
+  overflow: hidden;
 }
 
 .claim-card:hover {
@@ -446,10 +467,18 @@ body {
 
 .claim-card.pending {
   border-left-color: var(--warning);
+  overflow: visible;
+  height: auto;
+  min-height: 170px;
+  flex-shrink: 0;
 }
 
 .claim-card.my-claim {
   border-left-color: var(--success);
+  overflow: visible;
+  height: auto;
+  min-height: 170px;
+  flex-shrink: 0;
 }
 
 .claim-header {
@@ -469,10 +498,18 @@ body {
 
 .claim-details {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .claim-details p {
-  margin-bottom: 7px;
+  margin-bottom: 0;
+}
+
+.claim-card .claim-btn {
+  margin-top: auto;
+  align-self: stretch;
 }
 
 .status-badge {
@@ -505,6 +542,144 @@ body {
 .status-badge.pending {
   color: #101010;
   background: var(--danger);
+}
+
+.status-badge.approved {
+  color: #101010;
+  background: var(--success);
+}
+
+.status-badge.rejected {
+  color: #101010;
+  background: var(--danger);
+}
+
+.claim-chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.claim-chat-top {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.claim-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.claim-chat-meta {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.claim-chat-meta p {
+  margin-bottom: 6px;
+}
+
+.claim-chat-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chat-status-banner {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.chat-status-banner.pending {
+  color: #fff3de;
+  background: rgba(255, 188, 89, 0.16);
+  border-color: rgba(255, 188, 89, 0.3);
+}
+
+.chat-status-banner.success {
+  color: #e8ffe8;
+  background: rgba(87, 214, 136, 0.16);
+  border-color: rgba(87, 214, 136, 0.3);
+}
+
+.chat-status-banner.error {
+  color: #ffe8ec;
+  background: rgba(255, 110, 133, 0.16);
+  border-color: rgba(255, 110, 133, 0.3);
+}
+
+.chat-thread {
+  height: 360px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-message-row {
+  display: flex;
+}
+
+.chat-message-row.mine {
+  justify-content: flex-end;
+}
+
+.chat-message-row.theirs {
+  justify-content: flex-start;
+}
+
+.chat-bubble {
+  max-width: 70%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.chat-bubble.mine {
+  background: #2a1f16;
+}
+
+.chat-bubble.theirs {
+  background: #171717;
+}
+
+.chat-sender {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.chat-time {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-row input {
+  flex: 1;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #111111;
+  color: #f2f2f2;
+  font-size: 0.95rem;
 }
 
 .dashboard-actions {
@@ -1007,5 +1182,437 @@ body {
   .form-group select,
   .auth-form input {
     font-size: 16px;
+  }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+.mobile-menu-btn,
+.mobile-drawer,
+.mobile-drawer-overlay,
+.mobile-fab {
+  display: none;
+}
+
+.tab-bar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 24px;
+  background: #0c0c0c;
+  padding: 8px 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.tab-btn {
+  min-height: 48px;
+  border: 1px solid #2d2d2d;
+  border-radius: 10px;
+  background: #151515;
+  color: #bfbfbf;
+  font-size: 0.85rem;
+  font-weight: 700;
+  position: relative;
+  padding: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: #1e1e1e;
+  color: #fff;
+}
+
+.tab-btn.active {
+  color: #101010;
+  background: #ffffff;
+}
+
+.form-progress {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: #d6d6d6;
+  background: #1d1d1d;
+  border: 1px solid #2a2a2a;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0 0 72px;
+    max-width: 100%;
+  }
+
+  .app-header {
+    min-height: 56px;
+    height: 56px;
+    padding: 8px 16px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+  }
+
+  .header-content h1 {
+    font-size: 1.1rem;
+  }
+
+  .subtitle,
+  .header-actions {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    margin-left: auto;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #2d2d2d;
+    border-radius: 10px;
+    background: #151515;
+    color: #f5f5f5;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .mobile-drawer-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1100;
+  }
+
+  .mobile-drawer-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-drawer {
+    display: flex;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(86vw, 320px);
+    background: #101010;
+    border-left: 1px solid #262626;
+    z-index: 1101;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    padding: 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-drawer.open {
+    transform: translateX(0);
+  }
+
+  .mobile-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+.drawer-close-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #2d2d2d;
+  border-radius: 10px;
+  background: #191919;
+  color: #f2f2f2;
+}
+
+  .main-content {
+    padding: 12px 0 16px;
+  }
+
+  .dashboard-container,
+  .form-container {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 12px 16px;
+    max-width: 100%;
+  }
+
+  .dashboard-header h2,
+  .form-section h2,
+  .claim-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .dashboard-header p,
+  .section-description {
+    font-size: 0.875rem;
+  }
+
+  .dashboard-grid,
+  .dashboard-actions {
+    display: none;
+  }
+
+  .tab-bar {
+    margin-bottom: 12px;
+  }
+  
+  .tab-btn {
+    font-size: 0.75rem;
+  }
+
+
+  .tab-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    padding: 0 4px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #fff;
+    background: #ff3b30;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-content .dashboard-section {
+    min-height: auto;
+    border-radius: 12px;
+  }
+
+  .tab-content .section-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .tab-content .item-count {
+    min-width: 26px;
+    height: 26px;
+    font-size: 0.72rem;
+  }
+
+  .items-container,
+  .claims-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: none;
+    overflow: visible;
+    padding: 12px 0;
+  }
+
+  .item-card,
+  .item-card.compact,
+  .item-card.my-card {
+    width: 100%;
+    min-height: unset;
+    height: auto;
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid #2a2a2a;
+    border-radius: 0;
+    background: transparent;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: flex-start;
+    transform: none;
+  }
+
+  .item-image-small {
+    width: 64px;
+    min-width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .item-info {
+    padding: 0;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .item-main-content h4 {
+    font-size: 1rem;
+  }
+
+  .description-short {
+    display: none;
+  }
+
+  .location,
+  .date,
+  .owner,
+  .item-location,
+  .item-date,
+  .item-owner,
+  .claim-details,
+  .claim-date {
+    font-size: 0.75rem;
+  }
+
+  .claim-btn {
+    min-height: 48px;
+    font-size: 0.82rem;
+  }
+
+  .claim-card {
+    padding: 10px;
+    min-height: auto;
+  }
+
+  .status-badge {
+    padding: 2px 10px;
+    font-size: 0.68rem;
+    border-radius: 999px;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-content,
+  .claim-sheet-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 16px 16px 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 16px;
+    animation: bottomSheetIn 0.3s ease;
+    transform: translateY(0);
+  }
+
+  .claim-modal-form .submit-button,
+  .sticky-submit {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+  }
+
+  .claim-modal-form .submit-button,
+  .upload-form .submit-button,
+  .claim-form .submit-button {
+    min-height: 48px;
+  }
+
+  .upload-form,
+  .claim-form,
+  .claim-modal-form {
+    gap: 12px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .auth-form input {
+    min-height: 48px;
+  }
+
+  .form-group textarea {
+    min-height: 96px;
+  }
+
+  .empty-section {
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .mobile-fab {
+    display: inline-flex;
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    width: 56px;
+    height: 56px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(120deg, #ff5200, #ff7a00);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .auth-container {
+    min-height: 100vh;
+    padding: 24px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-box {
+    width: 100%;
+    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .auth-box h1 {
+    font-size: 1.7rem;
+  }
+
+  .app-footer {
+    font-size: 0.75rem;
+    padding: 12px 8px 20px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .app-container {
+    padding: 0 20px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-container,
+  .form-container {
+    padding: 20px;
+  }
+}
+
+@keyframes bottomSheetIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }

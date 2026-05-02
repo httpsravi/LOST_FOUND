@@ -137,66 +137,69 @@ function ClaimItem({ refreshTrigger, user }) {
             )}
           </>
         ) : (
-          <div className="claim-form-section">
-            <button
-              className="back-button"
-              onClick={() => setSelectedItem(null)}
-            >
-              ← Back to Items
-            </button>
-
-            <div className="selected-item-display">
-              <h3>Selected Item: {selectedItem.itemName}</h3>
-              {selectedItem.image && (
-                <img src={selectedItem.image} alt={selectedItem.itemName} className="selected-image" />
-              )}
-              <p>{selectedItem.description}</p>
-            </div>
-
-            {message && (
-              <div className={`message ${messageType}`}>
-                {message}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmitClaim} className="claim-form">
-              <h4>Your Information (Auto-filled)</h4>
-              <p><strong>Name:</strong> {user.name}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-
-              <div className="form-group">
-                <label htmlFor="claim-description">How Did You Find It? *</label>
-                <textarea
-                  id="claim-description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder="Describe where and how you found the item"
-                  rows="4"
-                  required
-                ></textarea>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="claim-contact">Contact Details</label>
-                <input
-                  type="text"
-                  id="claim-contact"
-                  name="contactDetails"
-                  value={formData.contactDetails}
-                  onChange={handleInputChange}
-                  placeholder="Phone number or additional contact info"
-                />
-              </div>
-
+          <div className="modal-overlay" onClick={() => setSelectedItem(null)}>
+            <div className="modal-content claim-sheet-content" onClick={(e) => e.stopPropagation()}>
               <button
-                type="submit"
-                className="submit-button"
-                disabled={loading}
+                className="close-modal"
+                onClick={() => setSelectedItem(null)}
               >
-                {loading ? 'Submitting Claim...' : 'Submit Claim'}
+                ✕
               </button>
-            </form>
+
+              <div className="selected-item-display">
+                <h3>Selected Item: {selectedItem.itemName}</h3>
+                {selectedItem.image && (
+                  <img src={selectedItem.image} alt={selectedItem.itemName} className="selected-image" />
+                )}
+                <p>{selectedItem.description}</p>
+              </div>
+
+              {message && (
+                <div className={`message ${messageType}`}>
+                  {message}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmitClaim} className="claim-form">
+                <div className="form-progress">Step 1 of 2</div>
+                <h4>Your Information (Auto-filled)</h4>
+                <p><strong>Name:</strong> {user.name}</p>
+                <p><strong>Email:</strong> {user.email}</p>
+
+                <div className="form-group">
+                  <label htmlFor="claim-description">How Did You Find It? *</label>
+                  <textarea
+                    id="claim-description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    placeholder="Describe where and how you found the item"
+                    rows="3"
+                    required
+                  ></textarea>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="claim-contact">Contact Details</label>
+                  <input
+                    type="text"
+                    id="claim-contact"
+                    name="contactDetails"
+                    value={formData.contactDetails}
+                    onChange={handleInputChange}
+                    placeholder="Phone number or additional contact info"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="submit-button sticky-submit"
+                  disabled={loading}
+                >
+                  {loading ? 'Submitting Claim...' : 'Submit Claim'}
+                </button>
+              </form>
+            </div>
           </div>
         )}
       </div>

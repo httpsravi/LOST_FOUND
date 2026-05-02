@@ -127,6 +127,80 @@ router.get('/claims', protect, async (req, res) => {
   }
 });
 
+// ─── GET /api/items/claims/:claimId ───────────────────────────────────────────
+// Get a single claim with associated lost item (protected - claimer or owner)
+router.get('/claims/:claimId', protect, async (req, res) => {
+  try {
+    const claim = await Claim.findById(req.params.claimId);
+    if (!claim) {
+      return res.status(404).json({ success: false, message: 'Claim not found' });
+    }
+
+    const item = await LostItem.findById(claim.lostItemId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Lost item not found' });
+    }
+
+    const isClaimer = claim.userId.toString() === req.user._id.toString();
+    const isReporter = item.userId.toString() === req.user._id.toString();
+    if (!isClaimer && !isReporter) {
+      return res.status(403).json({ success: false, message: 'Not authorized to access this claim' });
+    }
+
+    res.json({
+      ...claim.toObject(),
+      id: claim._id,
+      claimDate: claim.createdAt,
+      userId: claim.userId?.toString(),
+      lostItem: { ...item.toObject(), id: item._id, userId: item.userId?.toString() },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching claim details', error: error.message });
+  }
+});
+
+// ─── PATCH /api/items/claims/:claimId/status ──────────────────────────────────
+// Approve/reject a claim (protected - only item owner)
+router.patch('/claims/:claimId/status', protect, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Status must be approved or rejected' });
+    }
+
+    const claim = await Claim.findById(req.params.claimId);
+    if (!claim) {
+      return res.status(404).json({ success: false, message: 'Claim not found' });
+    }
+
+    const item = await LostItem.findById(claim.lostItemId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Lost item not found' });
+    }
+
+    if (item.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Not authorized to update this claim' });
+    }
+
+    claim.status = status;
+    await claim.save();
+
+    item.status = status === 'approved' ? 'resolved' : 'active';
+    await item.save();
+
+    res.json({
+      success: true,
+      message: `Claim ${status} successfully`,
+      data: {
+        claim: { ...claim.toObject(), id: claim._id, claimDate: claim.createdAt },
+        lostItem: { ...item.toObject(), id: item._id },
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error updating claim status', error: error.message });
+  }
+});
+
 // ─── POST /api/items/claim ────────────────────────────────────────────────────
 // Submit a claim on a lost item (protected)
 router.post('/claim', protect, async (req, res) => {
@@ -158,10 +232,6 @@ router.post('/claim', protect, async (req, res) => {
       contactDetails: contactDetails || '',
       status: 'pending',
     });
-
-    // Update the lost item status to 'claimed'
-    item.status = 'claimed';
-    await item.save();
 
     res.status(201).json({
       success: true,
